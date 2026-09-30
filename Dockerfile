@@ -42,7 +42,9 @@ FROM --platform=linux/amd64 debian:bullseye-slim@sha256:cba95a21c96c1f5fc2470081
 # for a historical snapshot; package signatures/checksums remain enforced.
 ARG DEBIAN_SNAPSHOT=20260831T235959Z
 RUN printf 'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/%s/ bullseye main\ndeb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/%s/ bullseye-security main\ndeb [check-valid-until=no] http://snapshot.debian.org/archive/debian/%s/ bullseye-updates main\n' \
-    "$DEBIAN_SNAPSHOT" "$DEBIAN_SNAPSHOT" "$DEBIAN_SNAPSHOT" > /etc/apt/sources.list
+    "$DEBIAN_SNAPSHOT" "$DEBIAN_SNAPSHOT" "$DEBIAN_SNAPSHOT" > /etc/apt/sources.list \
+ && printf 'Acquire::http::Timeout "120";\nAcquire::Retries "5";\n' > /etc/apt/apt.conf.d/99timeout
+
 # i386: QNX binutils (as/ld) are 32-bit x86. gmp/mpfr/mpc: GCC host binaries
 # link them. gcc: host C compiler for Cargo build scripts/proc-macros (NOT the
 # QNX cross-gcc). curl/ca-certificates/xz: fetch Go bootstrap + rustup.
